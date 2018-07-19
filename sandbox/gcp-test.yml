@@ -1,0 +1,39 @@
+- name: Create instance(s)
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    service_account_email: 273024975176-compute@developer.gserviceaccount.com
+    credentials_file: ~/.mygcpkey.json
+    project_id: studious-sign-161521
+    machine_type: f1-micro
+    image: debian-7
+
+  tasks:
+
+   - name: Launch instances
+     gce:
+         instance_names: dev
+         machine_type: "{{ machine_type }}"
+         image: "{{ image }}"
+         service_account_email: "{{ service_account_email }}"
+         credentials_file: "{{ credentials_file }}"
+         project_id: "{{ project_id }}"
+        tags: gitlab
+      register: gce
+
+    - name: Wait for SSH to come up
+      wait_for: host={{ item.public_ip }} port=22 delay=10 timeout=60
+      loop: "{{ gce.instance_data }}"
+
+    - name: Add host to groupname
+      add_host: hostname={{ item.public_ip }} groupname=new_instances
+      loop: "{{ gce.instance_data }}"
+
+- name: Install GitLab
+  hosts: new_instances
+  connection: ssh
+  sudo: True
+  roles:
+    - gitlab

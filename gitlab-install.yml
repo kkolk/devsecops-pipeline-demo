@@ -1,0 +1,87 @@
+- name: Create instance(s)
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    service_account_email: 273024975176-compute@developer.gserviceaccount.com
+    credentials_file: ~/.mygcpkey.json
+    project_id: studious-sign-161521
+    machine_type: n1-standard-1
+    image: debian-7
+    
+  tasks:
+
+  - name: Launch instances
+    gce:
+      instance_names: gitlab
+      machine_type: "{{ machine_type }}"
+      image: "{{ image }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+      metadata:  '{"os-login":"true"}'
+      tags: gitlab
+    register: gce
+
+  - name: Allow access to SSH
+    gce_net:
+      fwname: "gitlab-ssh-access"
+      name: "default"
+      ipv4_range: "{{ item.public_ip }}/32"
+      allowed: "tcp:22"
+      state: "present"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+    loop: "{{ gce.instance_data }}"
+
+  - name: Wait for SSH to come up
+    wait_for: 
+      host: "{{ item.public_ip }} "
+      port: 22 
+      timeout: 300
+    loop: "{{ gce.instance_data }}"
+
+  - name: Add host to groupname
+    add_host: 
+      hostname: "{{ item.public_ip }} "
+      groupname: new_instances
+    loop: "{{ gce.instance_data }}"
+
+  - name: Verify Host is responsive
+    setup: 
+      gather_timeout: 120
+    retries: 5
+  
+  - name: Allow HTTPs
+    gce_net:
+      fwname: "gitlab-https"
+      name: "default"
+      ipv4_range: "{{ item.public_ip }}/32"
+      allowed: "tcp:443"
+      state: "present"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+    loop: "{{ gce.instance_data }}"
+
+  - name: Allow HTTP
+    gce_net:
+      fwname: "gitlab-https"
+      name: "default"
+      ipv4_range: "{{ item.public_ip }}/32"
+      allowed: "tcp:80"
+      state: "present"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+    loop: "{{ gce.instance_data }}"
+
+- name: Install GitLab
+  hosts: new_instances
+  connection: ssh
+  become: true
+
+  roles:
+    - gitlab
