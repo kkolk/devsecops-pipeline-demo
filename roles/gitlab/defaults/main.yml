@@ -6,6 +6,7 @@ gitlab_edition: "gitlab-ce"
 gitlab_version: ''
 gitlab_backup_path: "/var/opt/gitlab/backups"
 gitlab_config_template: "gitlab.rb.j2"
+gitlab_default_password: "zdYD9wLzE4jb"
 
 # SSL Configuration.
 gitlab_redirect_http_to_https: "true"
@@ -14,7 +15,7 @@ gitlab_ssl_certificate_key: "/etc/gitlab/ssl/gitlab.key"
 
 # SSL Self-signed Certificate Configuration.
 gitlab_create_self_signed_cert: "true"
-gitlab_self_signed_cert_subj: "/C=US/ST=Missouri/L=Saint Louis/O=IT/CN=gitlab"
+gitlab_self_signed_cert_subj: "/C=US/ST=Georgia/L=Buford/O=IT/CN=gitlab"
 
 # LDAP Configuration.
 gitlab_ldap_enabled: "false"
