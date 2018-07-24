@@ -73,6 +73,3 @@
     group: root
     mode: 0600
   notify: restart gitlab
-
-- name: Set default password.
-  script: "scripts/set-default-password.sh {{ gitlab_default_password }}"

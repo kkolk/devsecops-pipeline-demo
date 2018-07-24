@@ -1,0 +1,22 @@
+- name: Set Ansible Callback Plugin
+  hosts: all
+  connection: ssh
+  become: true
+
+  tasks:
+  - name: Create ansible config folder
+    file:
+      path: /etc/ansible
+      state: directory
+      mode: 0755
+
+  - name: Fetch Ansible.cfg
+    get_url:
+      url: https://raw.githubusercontent.com/ansible/ansible/devel/examples/ansible.cfg
+      dest: /etc/ansible/ansible.cfg
+
+  - name: Enabled YAML output
+    lineinfile:
+      path: /etc/ansible/ansible.cfg
+      regexp: '^stdout_callback=' 
+      line: 'stdout_callback = yaml'

@@ -83,6 +83,11 @@
   connection: ssh
   become: true
 
+# Change this to something of your own, ideally vaulted.
+  environment:
+     GITLAB_ROOT_PASSWORD: "{{ gitlab_default_password }}"
+     GITLAB_ROOT_EMAIL: "{{ gitlab_default_email }}"
+
   roles:
     - gitlab
 
