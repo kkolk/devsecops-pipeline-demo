@@ -17,3 +17,14 @@
     backrefs: yes
   notify: restart_gitlab_runner
 
+- name: Create gitlab-runner certificates folder
+  file:
+    path: /etc/gitlab-runner/certs/
+    state: directory
+    mode: 0755
+
+- name: Copy self-signed certificate to gitlab-runner certs
+  copy:
+    src: "{{ gitlab_ssl_certificate }}"
+    dest: /etc/gitlab-runner/certs/{{ gitlab_hostname }}.crt
+    remote_src: yes

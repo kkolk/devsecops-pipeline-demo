@@ -6,13 +6,14 @@ Vagrant.configure("2") do |config|
   config.vm.define "gitlab" do |gitlab|
     gitlab.vm.box = "ubuntu/xenial64"
     gitlab.vm.network "private_network", ip: "192.168.100.10"
+    gitlab.vm.hostname = "gitlab"
     config.vm.provision :ansible_local do |ansible|
       ansible.playbook = "ansible-set-callback.yml"
       ansible.install_mode = "pip"
     end
     config.vm.provision :ansible_local do |ansible|
       ansible.playbook = "gitlab-install.yml"
-      # ansible.verbose = "-vvv"
+      ansible.verbose = "true"
     end
   end
 end

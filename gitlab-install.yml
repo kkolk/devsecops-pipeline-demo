@@ -13,6 +13,7 @@
 
   roles:
     - gitlab
+    - gitlab-runner
 
   tasks:
 
