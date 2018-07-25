@@ -25,11 +25,11 @@ Clone the repo and in the folder execute:
 
 Vagrant will:
 
-# Provision a new VM
-# Execute Ansible to install docker, gitlab, gitlab-runner
-# Perform some base configuration of Gitlab including setting up the default root account password and an API key
-# Register the gitlab-runner with gitlab.
-# Import the struts2-rce from https://github.com/kkolk/struts2-rce/tree/master as a new project in Gitlab.
+1. Provision a new VM
+2. Execute Ansible to install docker, gitlab, gitlab-runner
+3. Perform some base configuration of Gitlab including setting up the default root account password and an API key
+4. Register the gitlab-runner with gitlab.
+5. Import the struts2-rce from https://github.com/kkolk/struts2-rce/tree/master as a new project in Gitlab.
 
 Once vagrant has finished it's work, you can access Gitlab at https://gitlab.vagrant.test/ (192.168.100.10).
 
