@@ -24,4 +24,16 @@
     --ssh-port '{{ gitlab_runner_ssh_port }}'
     --ssh-password '{{ gitlab_runner_ssh_password }}'
     --ssh-identity-file '{{ gitlab_runner_ssh_identity_file }}'
+    --docker-privileged
   when: configured_runners.stderr.find('\n' + gitlab_runner_description) == -1
+
+- name: Set the pre_clone_script option
+  lineinfile:
+    dest: /etc/gitlab-runner/config.toml
+    regexp: 'url'
+    insertafter: '\[\[runners\]\]'
+    firstmatch: yes
+    line: '  pre_clone_script = {{ gitlab_runner_pre_clone_script | lower}}'
+    state: present
+  when: gitlab_runner_pre_clone_script is defined
+  notify: restart_gitlab_runner

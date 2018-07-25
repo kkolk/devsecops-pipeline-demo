@@ -16,7 +16,7 @@
     state: present
     backrefs: yes
   notify: restart_gitlab_runner
-
+  
 - name: Create gitlab-runner certificates folder
   file:
     path: /etc/gitlab-runner/certs/
