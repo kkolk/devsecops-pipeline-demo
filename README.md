@@ -2,7 +2,7 @@
 
 ## Requirements
 
-This demo uses Virtual box to deploy a local GitLab instance and configure it to run a DevSecOps Pipeline demo.  This demonstrates a DevSecOps kill-chain using the an application that contains the Struts2 vulnerability (CVE-2017-5638) made famous in the Equifax breach.
+This demo uses Virtual box to deploy a local GitLab instance and configure it to run a DevSecOps Pipeline demo.  This demonstrates a DevSecOps Pipeline using the an application that contains the Struts2 vulnerability (CVE-2017-5638) made famous in the Equifax breach.
 
 * VirtualBox
 * Vagrant
@@ -13,6 +13,25 @@ You will also need the [Vagrant Host Manager plugin](https://github.com/devopsgr
 
 See <https://github.com/devopsgroup-io/vagrant-hostmanager> for more information on this plugin.
 
-## Notes
+This demo assumes that 192.168.100.0/24 is available for host only network use.  You will need to adjust the vagrantfile if this is not the case.
 
-On windows with UAC enabled, several pop-ups will appear asking for permission to modify the system/run as administrator related to the Landrush DNS plugin for Vagrant.   This is local DNS server is needed in order for the demo to operate correctly.
+Virtual Machine for the demo uses 8gb of ram and 2 vCPUs.
+
+## Usage
+
+Clone the repo and in the folder execute:
+
+`vagrant up`
+
+Vagrant will:
+
+# Provision a new VM
+# Execute Ansible to install docker, gitlab, gitlab-runner
+# Perform some base configuration of Gitlab including setting up the default root account password and an API key
+# Register the gitlab-runner with gitlab.
+# Import the struts2-rce from https://github.com/kkolk/struts2-rce/tree/master as a new project in Gitlab.
+
+Once vagrant has finished it's work, you can access Gitlab at https://gitlab.vagrant.test/ (192.168.100.10).
+
+Default password for Gitlab's root account has been set to 'zdYD9wLzE4jb' this can be altered before running vagrant up by adjusting the settings in ./group_vars/all.yml
+
