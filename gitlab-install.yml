@@ -45,36 +45,6 @@
       validate_certs: no
     register: project_list
 
-  - name: Fetch list of runners
-    uri:
-      url: https://{{ gitlab_hostname }}/api/v4/projects
-      headers:
-        Private-Token: "{{ gitlab_default_token }}"
-      method: GET
-      validate_certs: no
-    register: runner_list
-
-  - name: Verify Docker runner doesn't exist.
-    set_fact: 
-      docker_runner_exists: true
-    with_items: "{{ runner_list.json }}"
-    when: item.name.find( "Docker runner" | first ) != -1
-
-  - name: Register a Docker runner
-    uri:
-      url: https://{{ gitlab_hostname }}/api/v4/runners
-      headers:
-        Private-Token: "{{ gitlab_default_token }}"
-      method: POST
-      validate_certs: no
-      body:
-        token: "{{ gitlab_shared_shared_runner_token }}"
-        description: "Docker runner"
-        tag_list: "docker"
-      body_format: json
-      status_code: 200, 201
-    when: docker_runner_exists is undefined
-
   - name: Verify struts2-rce demo project doesn't exist.
     set_fact: 
       struts2_rce_exists: true
