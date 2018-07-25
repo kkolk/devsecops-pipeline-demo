@@ -6,13 +6,12 @@ gitlab_runner_registration_token: '{{ gitlab_shared_shared_runner_token }}'
 gitlab_hostname: gitlab
 gitlab_ip_address: '192.168.100.10'
 gitlab_runner_executor: 'docker'
-gitlab_runner_docker_volumes:
-  - "/var/run/docker.sock:/var/run/docker.sock"
-  - "/cache"
+# gitlab_runner_docker_volumes:
+#   - "/var/run/docker.sock:/var/run/docker.sock"
+#   - "/cache"
 gitlab_runner_tags:
   - docker
-  - maven
-gitlab_runner_docker_image: 'maven:3-jdk-7'
+gitlab_runner_docker_image: 'maven:3-jdk-8'
 # GitLab coordinator URL
 gitlab_runner_coordinator_url: "https://{{ gitlab_hostname }}/ci"
 gitlab_ssl_certificate: "/etc/gitlab/ssl/gitlab.crt"

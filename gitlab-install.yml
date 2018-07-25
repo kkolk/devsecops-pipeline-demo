@@ -12,6 +12,7 @@
   - import_tasks: roles/gitlab/handlers/main.yml
 
   roles:
+    - docker
     - gitlab
     - gitlab-runner
 
