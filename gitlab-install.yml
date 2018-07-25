@@ -88,6 +88,68 @@
      GITLAB_ROOT_PASSWORD: "{{ gitlab_default_password }}"
      GITLAB_ROOT_EMAIL: "{{ gitlab_default_email }}"
 
-  roles:
-    - gitlab
+  # roles:
+  #   - gitlab
+
+  tasks:
+
+  # - name: Copy personal token script
+  #   copy:
+  #     src: scripts/create-api-token.sh
+  #     dest: /opt/gitlab/create-api-token.sh
+  #     owner: root
+  #     group: root
+  #     mode: 0744
+
+  - name: Wait for GitLab to start
+    wait_for:
+      port: 443
+      delay: 5
+      timeout: 100
+      msg: "Timeout waiting for 443 to respond"
+    register: port_check
+    ignore_errors: yes
+
+  # - name: Create a GitLab personal access token
+  #   script: scripts/create-api-token.sh "{{ gitlab_default_token }}"
+
+  - name: Fetch list of projects
+    uri:
+      url: https://localhost/api/v4/projects
+      headers:
+        Private-Token: "{{ gitlab_default_token }}"
+      method: GET
+      validate_certs: no
+    register: project_list
+
+  - debug:
+      var: project_list.json
+
+  - name: Create struts2-rce exploit demo project
+    uri:
+      url: https://localhost/api/v4/projects
+      headers:
+        Private-Token: "{{ gitlab_default_token }}"
+      method: POST
+      validate_certs: no
+      body:
+        name: "struts2-rce"
+        description: "Exploit Demo for CVE-2017-5638"
+        import_url: "https://github.com/kkolk/struts2-rce"
+      body_format: json
+      status_code: 200, 201
+  
+  # - name: Create API Session
+  # # curl http://git.ep.petrobras.com.br/api/v3/session --data 'login=myUser&password=myPass'
+  #   uri:
+  #     url: https://localhost/api/v4/session
+  #     method: POST
+  #     body: 'login=root&password={{ gitlab_default_password }}'
+  #     status_code: 302
+  #     return_content: yes
+  #     validate_certs: no
+  #   register: login_token
+
+  # - debug:
+  #     var: login_token
 
