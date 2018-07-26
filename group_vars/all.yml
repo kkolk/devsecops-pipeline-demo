@@ -15,6 +15,9 @@ gitlab_runner_tags:
 gitlab_runner_docker_image: 'maven:3-jdk-8'
 # GitLab coordinator URL
 gitlab_runner_coordinator_url: "https://{{ gitlab_hostname }}/ci"
-gitlab_ssl_certificate: "/etc/gitlab/ssl/{{ gitlab_hostname }}.crt"
 gitlab_runner_pre_clone_script: '"git config --global http.sslVerify false"'
 
+# SSL Configuration.
+gitlab_redirect_http_to_https: "true"
+gitlab_ssl_certificate: "/etc/gitlab/ssl/{{ gitlab_hostname }}.crt"
+gitlab_ssl_certificate_key: "/etc/gitlab/ssl/{{ gitlab_hostname }}.key"
