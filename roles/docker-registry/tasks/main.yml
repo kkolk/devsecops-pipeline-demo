@@ -1,0 +1,24 @@
+---
+# tasks file for ansible-role-docker-registry
+- name: Create directory docker_compose
+  file:
+    path: /var/local/docker_compose/registry
+    state: directory
+
+- name: Copy docker-compose.yml
+  copy:
+    src: docker-compose.yml
+    dest: /var/local/docker_compose/registry/docker-compose.yml
+
+- name: Install required Docker python modules
+  pip:
+    name: "{{ item }}"
+  with_items:
+    - docker
+    - docker-compose
+    - pyyaml
+
+- name: Launch registry service
+  docker_service:
+    project_src: /var/local/docker_compose/registry/
+    state: present

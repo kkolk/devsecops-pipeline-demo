@@ -13,6 +13,7 @@
 
   roles:
     - docker
+    - docker-registry
     - gitlab
     - gitlab-runner
 
