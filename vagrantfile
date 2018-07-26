@@ -5,27 +5,55 @@ Vagrant.configure("2") do |config|
   config.hostmanager.ignore_private_ip = false
   config.hostmanager.include_offline = true
 
-  # Setup Gitlab host resources
-  config.vm.provider "virtualbox" do |vb|
-    vb.memory = "8192"
-    vb.cpus = "2"
-    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-    vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
-  end
-
   # Provision Gitlab Host
   config.vm.define "gitlab" do |gitlab|
     gitlab.vm.box = "ubuntu/xenial64"
     gitlab.vm.network "private_network", ip: "192.168.100.10"
     gitlab.vm.hostname = "gitlab.vagrant.test"
-    config.vm.provision :ansible_local do |ansible|
+    
+    # Setup Gitlab host resources
+    gitlab.vm.provider "virtualbox" do |vb|
+      vb.memory = "8192"
+      vb.cpus = "2"
+      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    end
+
+    # Lets make ansible more readable.
+    gitlab.vm.provision :ansible_local do |ansible|
       ansible.playbook = "ansible-set-callback.yml"
       ansible.install_mode = "pip"
     end
-    config.vm.provision :ansible_local do |ansible|
+    # Run our Gitlab installation play
+    gitlab.vm.provision :ansible_local do |ansible|
       ansible.playbook = "gitlab-install.yml"
-      ansible.verbose = "-vvv"
+    end
+    # Few tasks post installation to gather some artifacts we need.
+    gitlab.vm.provision :ansible_local do |ansible|
+      ansible.playbook = "gitlab-postinstall.yml"
     end
   end
 
+  config.vm.define "development" do |dev|
+    dev.vm.box = "ubuntu/xenial64"
+    dev.vm.network "private_network", ip: "192.168.100.11"
+    dev.vm.hostname = "dev.vagrant.test"
+    # Setup Development host resources
+    dev.vm.provider "virtualbox" do |vb|
+      vb.memory = "512"
+      vb.cpus = "1"
+    end
+    # Lets make ansible more readable.
+    dev.vm.provision :ansible_local do |ansible|
+      ansible.playbook = "ansible-set-callback.yml"
+      ansible.install_mode = "pip"
+    end
+    dev.vm.provision :ansible_local do |ansible|
+      ansible.playbook = "dev-preinstall.yml"
+    end
+    dev.vm.provision :ansible_local do |ansible|
+      ansible.playbook = "dev-install.yml"
+      ansible.verbose = "-vvv"
+    end
+  end
 end

@@ -1,0 +1,13 @@
+- name: Setup Development Host
+  hosts: all
+  connection: ssh
+  become: true
+
+  roles:
+    - docker
+    - gitlab-runner
+
+  vars:
+    gitlab_runner_tags:
+      - development
+    gitlab_runner_executor: 'shell'

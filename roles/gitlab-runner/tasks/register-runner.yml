@@ -27,13 +27,14 @@
     --docker-privileged
   when: configured_runners.stderr.find('\n' + gitlab_runner_description) == -1
 
+
 - name: Set the pre_clone_script option
   lineinfile:
     dest: /etc/gitlab-runner/config.toml
-    regexp: 'runners'
-    insertafter: '\[\[runners\]\]'
-    firstmatch: yes
+    regexp: 'pre_clone_script'
+    create: yes
     line: '  pre_clone_script = {{ gitlab_runner_pre_clone_script | lower}}'
     state: present
   when: gitlab_runner_pre_clone_script is defined
   notify: restart_gitlab_runner
+  

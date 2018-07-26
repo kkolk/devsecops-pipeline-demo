@@ -1,0 +1,37 @@
+- name: Setup Certificates on Development Docker Host
+  hosts: all
+  connection: ssh
+  become: true
+
+  vars:
+    ansible_ssh_private_key_file: /.vagrant/machines/development/virtualbox/private_key
+    ansible_user: vagrant
+    artifact_path: ".artifacts"
+
+  tasks:
+  - name: Create GitLab SSL configuration folder.
+    file:
+      path: /etc/gitlab/ssl
+      state: directory
+      owner: root
+      group: root
+      mode: 0700
+
+  - name: Copy the GitLab certificate
+    copy:
+      src: "{{ artifact_path }}/{{ gitlab_hostname }}.crt"
+      dest: "{{ gitlab_ssl_certificate }}"
+  
+  - name: Copy the GitLab certificate key
+    copy:
+      src: "{{ artifact_path }}/{{ gitlab_hostname }}.key"
+      dest: "{{ gitlab_ssl_certificate_key }}"
+
+  - name: Add our GitLab certificate to trusted certificates
+    copy:
+      src: "{{ gitlab_ssl_certificate }}" 
+      dest: "/usr/local/share/ca-certificates/{{ gitlab_hostname }}.crt"
+      remote_src: yes
+
+  - name: Update trusted certificates
+    command: update-ca-certificates
