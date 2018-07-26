@@ -19,6 +19,15 @@
 
   tasks:
 
+  - name: Add our GitLab certificate to trusted certificates
+    copy:
+      src: "{{ gitlab_ssl_certificate }}" 
+      dest: "/usr/local/share/ca-certificates/{{ gitlab_hostname }}.crt"
+      remote_src: yes
+
+  - name: Update trusted certificates
+    command: update-ca-certificates
+
   - name: Ensure Gitlab is started.
     block:
       - name: Check if Gitlab is running.
