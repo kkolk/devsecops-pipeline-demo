@@ -1,0 +1,55 @@
+---
+- name: Install required Docker python modules
+  pip:
+    name: "{{ item }}"
+  with_items:
+    - docker
+    - docker-compose
+    - pyyaml
+
+- name: Make sure that the traefik directory exists
+  become: true
+  file:
+    group: "{{ traefik_group }}"
+    owner: "{{ traefik_user }}"
+    path: "{{ traefik_dir }}"
+    state: directory
+    mode: "0744"
+
+- name: Copy traefik config
+  template:
+    dest: "{{ traefik_dir }}/traefik.toml"
+    force: true
+    src: templates/traefik.toml.j2
+
+- name: Copy acme.json
+  copy:
+    dest: "{{ traefik_dir }}/acme.json"
+    force: false
+    mode: 0600
+    src: files/acme.json
+
+- name: Run traefik proxy
+  docker_container:
+    image: "{{ traefik_image }}"
+    labels:
+      traefik.backend: traefik
+      traefik.frontend.rule: "Host:{{ traefik_hostname }}"
+      traefik.port: "8081"
+    name: traefik
+    pull: true
+    ports:
+      - "80:80"
+      - "8080:8080"
+    recreate: true
+    restart_policy: always
+    state: "{{ traefik_state }}"
+    volumes: '[ "/var/run/docker.sock:/var/run/docker.sock", "{{ traefik_dir }}/traefik.toml:/etc/traefik/traefik.toml", "{{ traefik_dir }}/acme.json:/etc/traefik/acme.json" ] + {{ traefik_volumes }}'
+
+- name: Create network
+  docker_network:
+    driver: bridge
+    name: "{{ item }}"
+    connected: traefik
+  with_items: "{{ traefik_networks }}"
+  ignore_errors: yes

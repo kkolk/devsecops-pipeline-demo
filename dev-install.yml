@@ -5,6 +5,7 @@
 
   roles:
     - docker
+    - traefik
 
   tasks:
   - name: Setup basic facts
@@ -15,7 +16,7 @@
     user:
       name: deployer
       generate_ssh_key: yes
-      groups: docker,deployer
+      groups: docker
     register: deployment_user
 
   - name: Add deployment users key to authorized keys file
