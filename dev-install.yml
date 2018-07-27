@@ -5,9 +5,76 @@
 
   roles:
     - docker
-    - gitlab-runner
 
-  vars:
-    gitlab_runner_tags:
-      - development
-    gitlab_runner_executor: 'shell'
+  tasks:
+  - name: Setup basic facts
+    set_fact: 
+      ssh_private_key_exists: false
+
+  - name: Setup deployment user
+    user:
+      name: deployer
+      generate_ssh_key: yes
+      groups: docker,deployer
+    register: deployment_user
+
+  - name: Add deployment users key to authorized keys file
+    copy:
+      src: /home/deployer/.ssh/id_rsa.pub
+      dest: /home/deployer/.ssh/authorized_keys
+      mode: u=rw
+      owner: deployer
+      group: deployer
+      remote_src: yes
+
+  - name: Get the deployment users private key
+    slurp:
+      src: "{{ deployment_user.ssh_key_file }}"
+    register: deployer_private_key
+
+  - name: Fetch list of variables from struts2-rce project
+    uri:
+      url: https://{{ gitlab_hostname }}/api/v4/projects/root%2Fstruts2-rce/variables
+      headers:
+        Private-Token: "{{ gitlab_default_token }}"
+      method: GET
+      validate_certs: no
+    register: variable_list
+
+  - name: Verify SSH_PRIVATE_KEY variable doesn't exist.
+    set_fact: 
+      ssh_private_key_exists: true
+    with_items: "{{ variable_list.json }}"
+    when: item.key == "SSH_PRIVATE_KEY"
+
+  - name: Add SSH_PRIVATE_KEY variable to struts2-rce project
+    uri:
+      url: https://{{ gitlab_hostname }}/api/v4/projects/root%2Fstruts2-rce/variables
+      headers:
+        Private-Token: "{{ gitlab_default_token }}"
+      method: POST
+      validate_certs: no
+      body:
+        key: "SSH_PRIVATE_KEY"
+        value: "{{ deployer_private_key.content | b64decode }}"
+        protected: true
+        environment_scope: "*"
+      body_format: json
+      status_code: 200, 201
+    when: not ssh_private_key_exists
+
+  - name: Update SSH_PRIVATE_KEY variable in struts2-rce project
+    uri:
+      url: https://{{ gitlab_hostname }}/api/v4/projects/root%2Fstruts2-rce/variables/SSH_PRIVATE_KEY
+      headers:
+        Private-Token: "{{ gitlab_default_token }}"
+      method: PUT
+      validate_certs: no
+      body:
+        key: "SSH_PRIVATE_KEY"
+        value: "{{ deployer_private_key.content | b64decode }}"
+        protected: true
+        environment_scope: "*"
+      body_format: json
+      status_code: 200, 201
+    when: ssh_private_key_exists
