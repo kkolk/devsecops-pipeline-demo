@@ -37,7 +37,8 @@ Vagrant.configure("2") do |config|
   config.vm.define "development" do |dev|
     dev.vm.box = "ubuntu/xenial64"
     dev.vm.network "private_network", ip: "192.168.100.11"
-    dev.vm.hostname = "dev.vagrant.test"
+    dev.vm.hostname = "host.vagrant.test"
+    dev.hostmanager.aliases = %w(dev.vagrant.test test.vagrant.test stage.vagrant.test production.vagrant.test traefik.vagrant.local)
     # Setup Development host resources
     dev.vm.provider "virtualbox" do |vb|
       vb.memory = "512"
@@ -53,7 +54,6 @@ Vagrant.configure("2") do |config|
     end
     dev.vm.provision :ansible_local do |ansible|
       ansible.playbook = "dev-install.yml"
-      ansible.verbose = "-vvv"
     end
   end
 end

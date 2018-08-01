@@ -21,3 +21,20 @@ gitlab_runner_pre_clone_script: '"git config --global http.sslVerify false"'
 gitlab_redirect_http_to_https: "true"
 gitlab_ssl_certificate: "/etc/gitlab/ssl/{{ gitlab_hostname }}.crt"
 gitlab_ssl_certificate_key: "/etc/gitlab/ssl/{{ gitlab_hostname }}.key"
+
+
+traefik_certificates: []
+traefik_docker_domain: vagrant.test
+traefik_group: root
+traefik_dir: /etc/traefik
+traefik_networks:
+  - web
+traefik_user: root
+traefik_state: started
+traefik_hostname: "traefik.{{ traefik_docker_domain }}"
+traefik_volumes: [
+  "{{ traefik_dir}}/logs:/var/log/traefik"
+]
+traefik_https: false
+traefik_https_redirect: false
+traefik_debug: true

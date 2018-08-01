@@ -5,6 +5,7 @@
 
   roles:
     - docker
+    - traefik
 
   tasks:
   - name: Setup basic facts
