@@ -33,3 +33,13 @@
 
   - name: Update trusted certificates
     command: update-ca-certificates
+
+  - name: Install SwapSpace daemon
+    apt:
+      name: swapspace
+      state: present
+
+  - name: Ensure SwapSpace is running
+    service:
+      name: swapspace
+      state: started
