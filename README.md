@@ -54,7 +54,7 @@ You should now see the struts2-rce repository, to launch a build of the project 
 
 The pipelines screen will appear showing that there are currently no pipelines.  Click the **Run Pipeline** button, accept the default values, and click **Create Pipeline**.
 
-The build, create a docker container, and deploy it to a test host.   Once the **deploy_development** step is completed, you can verify that tomcat is running the struts2-rce app by visiting: http://dev.vagrant.test:8080/orders
+This will build the application, create a docker container, and deploy it to a test host.   Once the **deploy_development** step is completed, you can verify that tomcat is running the struts2-rce app by visiting: http://dev.vagrant.test:8080/orders
 
 ## Testing the exploit
 
