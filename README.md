@@ -58,7 +58,7 @@ This will build the application, create a docker container, and deploy it to a t
 
 ## Testing the exploit
 
-Run the exploit.py file with a command of your choice. 
+Run the exploit.py file with a shell/terminal of your choice. 
 
 ```
 python exploit.py http://dev.vagrant.test:8080/orders/3 "%CMD%" 
